@@ -1,0 +1,73 @@
+
+
+* Connect nrepl server up
+
+** talios plugin
+
+Starts a nrepl server that's nice.
+
+But it uses a default port (defined in pom.xml) which is not. This needs to be
+random so that multiple connections can be made.
+
+Second problem is that talios plugin actually launches clojure through an exec
+call somewhere down the line. So, I am going to have problems getting maven
+information out of it. No, actually, this is probably correct, although this
+may be a pain in the ass in other ways for getting source information for
+instance.
+
+Conclusions -- either we need to fix this, or we need a new plugin.
+
+** How to do this
+
+Launching a server is easy. Need to do this *inside mojo*.
+
+(use '[clojure.tools.nrepl.server :only (start-server stop-server)])
+(defonce server (start-server :port 7888))
+
+But we also need to apply the appropriate middleware
+
+cider-nrepl does this here in cider/nrepl
+
+Although I have not yet worked out how or when this gets called. leiningen
+does it somewhere I think.
+
+(def cider-nrepl-handler
+  "CIDER's nREPL handler."
+  (apply nrepl-server/default-handler (map resolve cider-middleware)))
+
+Regardless, we need maven plugin into which we can add a new handler.
+
+/start-server takes a :handler arg.
+
+
+** classpath.clj
+
+A nice and easy middleware for sending the classpath (and probably we want).
+
+Oh dear, I need to write a maven plugin.
+
+
+** Implement a maven plugin
+
+ - [ ] Find Maven plugin archetype
+ - [ ] Add relevant dependencies
+ - [ ] Launch nrepl in context of project
+
+
+** Or...
+
+We could just use the Clojure plugin to launch a clojure script in the context
+of the current project. The Clojure script then launches nrepl with all the
+middleware options.
+
+We would could also launch this script with anything at all, which would
+loosen the maven dependency.
+
+** This works with the exec plugin
+
+mvn exec:java -Dexec.mainClass="clojure.main" -Dexec.args="src/main/hello.clj"
+
+mvn exec:java -Dexec.mainClass="clojure.main" -Dexec.args="/home/phillord/src/jde-with-clojure-backend/jde-interactive/jde-launch-nrepl.clj"
+
+
+So, that's it -- we just need to get the jde artifact installed

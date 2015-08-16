@@ -1,20 +1,21 @@
 ;;; jde-interactive.el --- The JVM backend for JDE. -*- lexical-binding: t -*-
 
 ;; Version: 0.1-SNAPSHOT
-;; Package-Requires: ((jde "0.1"))
+;; Package-Requires: ((jde "0.1")(cider)(load-relative))
 
 ;; The contents of this file are subject to the GPL License, Version 3.0.
 (require 'nrepl-client)
 (require 'cider)
-
+(require 'load-relative)
 
 (defconst jde-interactive-version "0.1-SNAPSHOT")
 
+(defvar jde-nrepl-launch-script
+  (relative-expand-file-name "jde-launch-nrepl.clj"))
 
 (defun jde-interactive-project-directory-for (dir-name)
   (when dir-name
     (locate-dominating-file dir-name "pom.xml")))
-
 
 ;;;###autoload
 (defun jde-interactive-jack-in ()
@@ -27,7 +28,12 @@
       (let* ((nrepl-create-client-buffer-function #'cider-repl-create)
              (nrepl-use-this-as-repl-buffer repl-buff)
              (serv-proc
-              (nrepl-start-server-process project-dir "mvn clojure:nrepl")))
+              (nrepl-start-server-process
+               project-dir
+               ;; TODO: FIXME: generalise!
+               (format
+                "mvn exec:java -Dexec.mainClass=\"clojure.main\" -Dexec.args=\"%s\""
+                jde-nrepl-launch-script))))
         ;; FIXME: clojure:nrepl drops strange strings out!
         (set-process-filter serv-proc #'jde-interactive-server-filter)))))
 
@@ -39,7 +45,7 @@
       (insert output)))
   (message "checking %s" output)
   ;; FIXME: what a crappy matcher this is!
-  (when (string-match ":port \\([0-9]+\\)" output)
+  (when (string-match "nREPL server started on port \\([0-9]+\\)" output)
     (let ((port (string-to-number (match-string 1 output))))
       (message (format "nREPL server started on %s" port))
       (with-current-buffer (process-buffer process)
