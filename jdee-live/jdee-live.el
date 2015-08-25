@@ -1,4 +1,4 @@
-;;; jde-interactive.el --- The JVM backend for JDE. -*- lexical-binding: t -*-
+;;; jdee-live.el --- The JVM backend for JDE. -*- lexical-binding: t -*-
 
 ;; Version: 0.1-SNAPSHOT
 ;; Package-Requires: ((jde "0.1")(cider)(load-relative))
@@ -8,22 +8,22 @@
 (require 'cider)
 (require 'load-relative)
 
-(defconst jde-interactive-version "0.1-SNAPSHOT")
+(defconst jdee-live-version "0.1-SNAPSHOT")
 
-(defvar jde-nrepl-launch-script
-  (relative-expand-file-name "jde-launch-nrepl.clj"))
+(defvar jdee-live-launch-script
+  (relative-expand-file-name "jdee-launch-nrepl.clj"))
 
-(defun jde-interactive-project-directory-for (dir-name)
+(defun jdee-live-project-directory-for (dir-name)
   (when dir-name
     (locate-dominating-file dir-name "pom.xml")))
 
 ;;;###autoload
-(defun jde-interactive-jack-in ()
+(defun jdee-live-jack-in ()
   (interactive)
   ;; start a maven process which, connect to the nrepl client, check the
   ;; versions of the middle ware
   (let* ((project-dir
-          (jde-interactive-project-directory-for (nrepl-current-dir))))
+          (jdee-live-project-directory-for (nrepl-current-dir))))
     (-when-let (repl-buff (nrepl-find-reusable-repl-buffer nil project-dir))
       (let* ((nrepl-create-client-buffer-function #'cider-repl-create)
              (nrepl-use-this-as-repl-buffer repl-buff)
@@ -32,19 +32,22 @@
                project-dir
                ;; TODO: FIXME: generalise!
                (format
-                "mvn exec:java -Dexec.mainClass=\"clojure.main\" -Dexec.args=\"%s\""
-                jde-nrepl-launch-script))))
+                (concat "mvn jdee:jdee-maven-nrepl:java "
+                        "-Dexec.mainClass=\"clojure.main\""
+                        " -Dexec.args=\"%s\""
+                        " -Dexec.includePluginsDependencies=true"
+                        )
+                jdee-live-launch-script))))
         ;; FIXME: clojure:nrepl drops strange strings out!
-        (set-process-filter serv-proc #'jde-interactive-server-filter)))))
+        (set-process-filter serv-proc #'jdee-live-server-filter)))))
 
-(defun jde-interactive-server-filter (process output)
+(defun jdee-live-server-filter (process output)
   "Process nREPL server output from PROCESS contained in OUTPUT."
   (with-current-buffer (process-buffer process)
     (save-excursion
       (goto-char (point-max))
       (insert output)))
   (message "checking %s" output)
-  ;; FIXME: what a crappy matcher this is!
   (when (string-match "nREPL server started on port \\([0-9]+\\)" output)
     (let ((port (string-to-number (match-string 1 output))))
       (message (format "nREPL server started on %s" port))
@@ -57,9 +60,9 @@
 
 
 ;;;###autoload
-(define-minor-mode jde-interactive-mode
+(define-minor-mode jdee-live-mode
   "Minor mode for JVM/Clojure interaction from a Java buffer."
   )
 
-(provide 'jde-interactive)
-;;; jde-interactive.el ends here
+(provide 'jdee-live)
+;;; jdee-live.el ends here

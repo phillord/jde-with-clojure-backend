@@ -71,3 +71,11 @@ mvn exec:java -Dexec.mainClass="clojure.main" -Dexec.args="/home/phillord/src/jd
 
 
 So, that's it -- we just need to get the jde artifact installed
+
+
+** Use my own plugin 
+
+The only issue is that the project dependencies are wrong. We need to make 
+sure that these are in place as well. But this should be straightforward -- we
+just have a blank plugin which passes all functionality to the superclass
+(maven exec plugin) but which brings in new dependencies.
