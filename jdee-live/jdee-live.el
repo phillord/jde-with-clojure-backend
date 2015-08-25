@@ -11,7 +11,7 @@
 (defconst jdee-live-version "0.1-SNAPSHOT")
 
 (defvar jdee-live-launch-script
-  (relative-expand-file-name "jdee-launch-nrepl.clj"))
+  (relative-expand-file-name "clj/jdee-launch-nrepl.clj"))
 
 (defun jdee-live-project-directory-for (dir-name)
   (when dir-name
