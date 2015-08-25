@@ -8,3 +8,7 @@ mvn install
 cd ..
 cd jdee-live
 cask package
+cd ..
+cd jdee-sample/
+mvn install
+cd ..

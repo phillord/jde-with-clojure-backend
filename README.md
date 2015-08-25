@@ -29,6 +29,19 @@ Build
 Build uses leiningen to build jdee-nrepl, maven to build the maven plugin, and
 cask to build the Emacs package. jdee-sample is just for testing.
 
+Use
+---
+
+Build and install the package (use ./build.sh or just type the commands in).
+Install jdee-live.el (M-x package-install-file, then jdee-live, dist,
+jdee-live-0.1snapshot.el). Open "App.java" from jdee-sample, then M-x
+jdee-live-jack-in. After a while, you should get a Clojure shell running with
+the correct class path. So
+
+    (uk.org.russet.App/hello)
+
+should return "Hello World!".
+
 
 Status
 ------

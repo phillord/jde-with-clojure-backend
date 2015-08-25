@@ -1,7 +1,7 @@
 ;;; jdee-live.el --- The JVM backend for JDE. -*- lexical-binding: t -*-
 
 ;; Version: 0.1-SNAPSHOT
-;; Package-Requires: ((jde "0.1")(cider)(load-relative))
+;; Package-Requires: ((cider)(load-relative))
 
 ;; The contents of this file are subject to the GPL License, Version 3.0.
 (require 'nrepl-client)
