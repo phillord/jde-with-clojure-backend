@@ -42,6 +42,13 @@ the correct class path. So
 
 should return "Hello World!".
 
+You can also try:
+
+    M-x cider-classpath
+
+which starts CIDERs classpath browser.
+
+
 
 Status
 ------
