@@ -1,12 +1,15 @@
 (ns jdee.nrepl.nrepl
   (:require [clojure.tools.nrepl.server :as nrepl-server]
-            [cider.nrepl.middleware.classpath]
-            ))
+            [cider.nrepl.middleware
+             classpath
+             stacktrace]))
 
 
 (def jdee-middleware
   "A vector of symbols for all the JDE middleware"
-  '[cider.nrepl.middleware.classpath/wrap-classpath]
+  '[cider.nrepl.middleware.classpath/wrap-classpath
+    cider.nrepl.middleware.stacktrace/wrap-stacktrace
+    ]
   )
 
 (def jdee-nrepl-handler
