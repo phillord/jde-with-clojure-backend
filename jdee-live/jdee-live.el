@@ -1,10 +1,15 @@
 ;;; jdee-live.el --- The JVM backend for JDE. -*- lexical-binding: t -*-
 
-;; Version: 0.1-SNAPSHOT
-;; Package-Requires: ((cider)(load-relative))
+;; Version: 0.1
+;; Package-Requires: ((cider "20151020.646")(load-relative "20150224.1722"))
 
+;;; Commentary:
+;;  Prototype nrepl backend
+
+
+;;; Code:
 ;; The contents of this file are subject to the GPL License, Version 3.0.
-(require 'nrepl-client)
+(require 'cider-client)
 (require 'cider)
 (require 'load-relative)
 
@@ -23,8 +28,8 @@
   ;; start a maven process which, connect to the nrepl client, check the
   ;; versions of the middle ware
   (let* ((project-dir
-          (jdee-live-project-directory-for (nrepl-current-dir))))
-    (-when-let (repl-buff (nrepl-find-reusable-repl-buffer nil project-dir))
+          (jdee-live-project-directory-for (cider-current-dir))))
+    (-when-let (repl-buff (cider-find-reusable-repl-buffer nil project-dir))
       (let* ((nrepl-create-client-buffer-function #'cider-repl-create)
              (nrepl-use-this-as-repl-buffer repl-buff)
              (serv-proc
